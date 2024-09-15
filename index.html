@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>3D Text AR Experience</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/aframe/1.2.0/aframe.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/ar.js/2.2.2/aframe-ar.min.js"></script>
+    <style>
+      #controls {
+        position: absolute;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        z-index: 1000;
+        background: rgba(255, 255, 255, 0.7);
+        padding: 10px;
+        border-radius: 5px;
+      }
+      input, button {
+        margin: 5px;
+        padding: 5px;
+      }
+    </style>
+  </head>
+  <body style="margin: 0; overflow: hidden;">
+    <div id="controls">
+      <input type="text" id="textInput" placeholder="Enter text">
+      <input type="text" id="emojiInput" placeholder="Enter emoji">
+      <button id="updateButton">Update Text</button>
+      <button id="addEmojiButton">Add Emoji</button>
+    </div>
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;">
+      <a-entity id="textEntity" position="0 0 -3"></a-entity>
+      <a-entity id="emojiEntity" position="0 -1 -3"></a-entity>
+      <a-entity camera position="0 1.6 0"></a-entity>
+    </a-scene>
+    <script>
+      let textEntity = document.getElementById('textEntity');
+      let emojiEntity = document.getElementById('emojiEntity');
+      let textInput = document.getElementById('textInput');
+      let emojiInput = document.getElementById('emojiInput');
+      let updateButton = document.getElementById('updateButton');
+      let addEmojiButton = document.getElementById('addEmojiButton');
+
+      function updateText() {
+        let text = textInput.value || "AR Text";
+        textEntity.innerHTML = '';
+        let xOffset = 0;
+        let totalWidth = text.length * 0.8; // Estimate total width
+        let startX = -totalWidth / 2; // Center the text
+
+        for (let i = 0; i < text.length; i++) {
+          let letter = document.createElement('a-text');
+          letter.setAttribute('value', text[i]);
+          letter.setAttribute('color', '#0000FF');
+          letter.setAttribute('position', `${startX + xOffset} 0 0`);
+          letter.setAttribute('scale', '1.5 1.5 1.5');
+          letter.setAttribute('font', 'mozillavr');
+          
+          let outline = document.createElement('a-text');
+          outline.setAttribute('value', text[i]);
+          outline.setAttribute('color', '#000000');
+          outline.setAttribute('position', '-0.01 -0.01 -0.01');
+          outline.setAttribute('scale', '1.55 1.55 1.55');
+          outline.setAttribute('font', 'mozillavr');
+          
+          let letterContainer = document.createElement('a-entity');
+          letterContainer.appendChild(outline);
+          letterContainer.appendChild(letter);
+          textEntity.appendChild(letterContainer);
+          
+          xOffset += 0.8; // Adjust this value to increase/decrease gap between letters
+        }
+      }
+
+      function addEmoji() {
+        let emoji = emojiInput.value || "😊";
+        let emojiText = document.createElement('a-text');
+        emojiText.setAttribute('value', emoji);
+        emojiText.setAttribute('scale', '2 2 2');
+        emojiText.setAttribute('position', `${Math.random() * 4 - 2} ${Math.random() * 2} 0`);
+        emojiEntity.appendChild(emojiText);
+      }
+
+      updateButton.addEventListener('click', updateText);
+      addEmojiButton.addEventListener('click', addEmoji);
+
+      // Initial text update
+      updateText();
+    </script>
+  </body>
+</html>
